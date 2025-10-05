@@ -1,0 +1,494 @@
+```html
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Alerta Cidadão</title>
+    <style>
+        :root {
+            --primary-color: #2f437d;
+            --secondary-color: #b74d4d;
+            --dark-color: #1a2a57;
+            --light-color: #3f5380;
+            --text-color: #fff;
+            --shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background-color: var(--primary-color);
+            color: var(--text-color);
+            min-height: 100vh;
+            padding-bottom: 60px;
+        }
+        
+        .container {
+            max-width: 400px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        .card {
+            background-color: var(--dark-color);
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: var(--shadow);
+            margin-bottom: 20px;
+        }
+        
+        h1, h2 {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        
+        input, textarea, select {
+            width: 100%;
+            padding: 12px;
+            margin: 10px 0;
+            border-radius: 5px;
+            border: none;
+            background-color: rgba(255, 255, 255, 0.9);
+        }
+        
+        button {
+            width: 100%;
+            padding: 12px;
+            background-color: var(--secondary-color);
+            color: var(--text-color);
+            border: none;
+            border-radius: 5px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        
+        button:hover {
+            background-color: #a13e3e;
+        }
+        
+        .checkbox-container {
+            display: flex;
+            align-items: center;
+            margin: 10px 0;
+        }
+        
+        .checkbox-container input {
+            width: auto;
+            margin-right: 10px;
+        }
+        
+        nav {
+            display: flex;
+            justify-content: space-around;
+            background-color: var(--dark-color);
+            padding: 15px 0;
+            position: fixed;
+            bottom: 0;
+            width: 100%;
+            box-shadow: 0 -2px 5px rgba(0, 0, 0, 0.2);
+        }
+        
+        nav a {
+            color: var(--text-color);
+            text-decoration: none;
+            text-align: center;
+            padding: 5px 10px;
+            border-radius: 5px;
+            transition: background-color 0.3s;
+        }
+        
+        nav a.active {
+            background-color: var(--secondary-color);
+        }
+        
+        .map-placeholder {
+            height: 200px;
+            background-color: var(--light-color);
+            margin-bottom: 10px;
+            border-radius: 5px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-style: italic;
+        }
+        
+        .report-item {
+            background-color: var(--light-color);
+            padding: 15px;
+            margin-bottom: 10px;
+            border-radius: 5px;
+            box-shadow: var(--shadow);
+        }
+        
+        .report-id {
+            font-weight: bold;
+            color: var(--secondary-color);
+        }
+        
+        .report-date {
+            font-size: 0.8em;
+            color: #ccc;
+            margin-top: 5px;
+        }
+        
+        .status {
+            display: inline-block;
+            padding: 3px 8px;
+            border-radius: 12px;
+            font-size: 0.8em;
+            margin-left: 10px;
+        }
+        
+        .status-pending {
+            background-color: #ff9800;
+        }
+        
+        .status-in-progress {
+            background-color: #2196f3;
+        }
+        
+        .status-resolved {
+            background-color: #4caf50;
+        }
+        
+        .hidden {
+            display: none;
+        }
+        
+        .link {
+            color: var(--text-color);
+            text-decoration: underline;
+            cursor: pointer;
+        }
+        
+        .text-center {
+            text-align: center;
+        }
+        
+        .mt-20 {
+            margin-top: 20px;
+        }
+        
+        .user-info {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        
+        .logout-btn {
+            background-color: transparent;
+            border: 1px solid var(--secondary-color);
+            width: auto;
+            padding: 8px 15px;
+            margin-top: 10px;
+        }
+    </style>
+</head>
+<body>
+    <!-- Página de Login -->
+    <div id="login-page" class="container">
+        <div class="card">
+            <h1>Alerta Cidadão</h1>
+            <input type="text" id="login-cpf" placeholder="CPF">
+            <input type="password" id="login-password" placeholder="Senha">
+            <div class="checkbox-container">
+                <input type="checkbox" id="remember"> 
+                <label for="remember">Lembrar senha</label>
+            </div>
+            <button onclick="loginUser()">Entrar</button>
+            <p class="text-center mt-20">
+                <span class="link" onclick="showPage('register-page')">Registrar</span> | 
+                <span class="link" onclick="alert('Funcionalidade em desenvolvimento')">Esqueci minha senha</span>
+            </p>
+        </div>
+    </div>
+    
+    <!-- Página de Registro -->
+    <div id="register-page" class="container hidden">
+        <div class="card">
+            <h1>Registrar</h1>
+            <input type="text" id="register-username" placeholder="Nome completo">
+            <input type="email" id="register-email" placeholder="Email">
+            <input type="text" id="register-cpf" placeholder="CPF">
+            <input type="text" id="register-city" placeholder="Cidade / Estado">
+            <input type="password" id="register-password" placeholder="Senha">
+            <button onclick="registerUser()">Criar Conta</button>
+            <p class="text-center mt-20">
+                <span class="link" onclick="showPage('login-page')">Voltar para o login</span>
+            </p>
+        </div>
+    </div>
+    
+    <!-- Página de Denúncia -->
+    <div id="report-page" class="container hidden">
+        <div class="card">
+            <h2>REGISTRAR PROBLEMA</h2>
+            <div class="map-placeholder">[MAPA GPS DETECTADO]</div>
+            <select id="problem-type">
+                <option value="">Selecione o tipo de problema</option>
+                <option value="buraco">Buraco na via</option>
+                <option value="iluminacao">Falta de iluminação</option>
+                <option value="lixo">Acúmulo de lixo</option>
+                <option value="agua">Vazamento de água</option>
+                <option value="outro">Outro</option>
+            </select>
+            <textarea id="report-description" placeholder="Descreva o problema em detalhes..."></textarea>
+            <button onclick="addReport()">Enviar Denúncia</button>
+        </div>
+    </div>
+    
+    <!-- Página de Minhas Denúncias -->
+    <div id="myreports-page" class="container hidden">
+        <div class="card">
+            <h2>Minhas Denúncias</h2>
+            <div id="reportsContainer"></div>
+        </div>
+    </div>
+    
+    <!-- Página de Perfil -->
+    <div id="profile-page" class="container hidden">
+        <div class="card">
+            <h2>Meu Perfil</h2>
+            <div class="user-info">
+                <p id="profile-username"></p>
+                <p id="profile-email"></p>
+                <p id="profile-city"></p>
+                <button class="logout-btn" onclick="logout()">Sair</button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Navegação -->
+    <nav id="navigation" class="hidden">
+        <a href="#" onclick="showPage('report-page')" id="nav-report">Início</a>
+        <a href="#" onclick="showPage('myreports-page')" id="nav-myreports">Minhas Denúncias</a>
+        <a href="#" onclick="showPage('profile-page')" id="nav-profile">Perfil</a>
+    </nav>
+
+    <script>
+        // Inicialização
+        document.addEventListener('DOMContentLoaded', function() {
+            // Verificar se há um usuário logado
+            const currentUser = JSON.parse(localStorage.getItem('currentUser'));
+            if (currentUser) {
+                showPage('report-page');
+                updateNavigation('report-page');
+                loadProfile();
+            } else {
+                showPage('login-page');
+            }
+        });
+        
+        // Funções de usuário
+        function registerUser() {
+            const username = document.getElementById('register-username').value;
+            const email = document.getElementById('register-email').value;
+            const cpf = document.getElementById('register-cpf').value;
+            const city = document.getElementById('register-city').value;
+            const password = document.getElementById('register-password').value;
+            
+            if (!username || !email || !cpf || !city || !password) {
+                alert('Por favor, preencha todos os campos!');
+                return;
+            }
+            
+            let users = JSON.parse(localStorage.getItem('users') || '[]');
+            
+            // Verificar se o CPF já existe
+            if (users.find(u => u.cpf === cpf)) {
+                alert('CPF já cadastrado!');
+                return;
+            }
+            
+            users.push({
+                username, 
+                email, 
+                cpf, 
+                city, 
+                password, 
+                reports: []
+            });
+            
+            localStorage.setItem('users', JSON.stringify(users));
+            alert('Conta criada com sucesso!');
+            showPage('login-page');
+        }
+        
+        function loginUser() {
+            const cpf = document.getElementById('login-cpf').value;
+            const password = document.getElementById('login-password').value;
+            
+            let users = JSON.parse(localStorage.getItem('users') || '[]');
+            let user = users.find(u => u.cpf === cpf && u.password === password);
+            
+            if (user) {
+                localStorage.setItem('currentUser', JSON.stringify(user));
+                showPage('report-page');
+                updateNavigation('report-page');
+                loadProfile();
+            } else {
+                alert('CPF ou senha incorretos!');
+            }
+        }
+        
+        function logout() {
+            localStorage.removeItem('currentUser');
+            showPage('login-page');
+            document.getElementById('navigation').classList.add('hidden');
+        }
+        
+        function loadProfile() {
+            const user = JSON.parse(localStorage.getItem('currentUser'));
+            if (user) {
+                document.getElementById('profile-username').textContent = user.username;
+                document.getElementById('profile-email').textContent = user.email;
+                document.getElementById('profile-city').textContent = user.city;
+            }
+        }
+        
+        // Funções de denúncia
+        function addReport() {
+            const problemType = document.getElementById('problem-type').value;
+            const description = document.getElementById('report-description').value;
+            
+            if (!problemType || !description) {
+                alert('Por favor, selecione o tipo de problema e forneça uma descrição!');
+                return;
+            }
+            
+            let user = JSON.parse(localStorage.getItem('currentUser'));
+            let users = JSON.parse(localStorage.getItem('users') || '[]');
+            
+            const reportId = Date.now();
+            const statuses = ['pending', 'in-progress', 'resolved'];
+            const randomStatus = statuses[Math.floor(Math.random() * statuses.length)];
+            
+            user.reports.push({
+                id: reportId, 
+                problemType: problemType,
+                description: description, 
+                date: new Date().toLocaleString(),
+                status: randomStatus
+            });
+            
+            users = users.map(u => u.cpf === user.cpf ? user : u);
+            localStorage.setItem('users', JSON.stringify(users));
+            localStorage.setItem('currentUser', JSON.stringify(user));
+            
+            alert('Denúncia registrada!\nProtocolo: #' + reportId);
+            showPage('myreports-page');
+            updateNavigation('myreports-page');
+            displayReports();
+        }
+        
+        function displayReports() {
+            const user = JSON.parse(localStorage.getItem('currentUser'));
+            const container = document.getElementById('reportsContainer');
+            container.innerHTML = '';
+            
+            if (!user || user.reports.length === 0) {
+                container.innerHTML = '<p>Nenhuma denúncia registrada.</p>';
+                return;
+            }
+            
+            user.reports.forEach(r => {
+                const div = document.createElement('div');
+                div.classList.add('report-item');
+                
+                let statusText = '';
+                let statusClass = '';
+                
+                switch(r.status) {
+                    case 'pending':
+                        statusText = 'Pendente';
+                        statusClass = 'status-pending';
+                        break;
+                    case 'in-progress':
+                        statusText = 'Em Andamento';
+                        statusClass = 'status-in-progress';
+                        break;
+                    case 'resolved':
+                        statusText = 'Resolvido';
+                        statusClass = 'status-resolved';
+                        break;
+                }
+                
+                div.innerHTML = `
+                    <div class="report-id">#${r.id} <span class="status ${statusClass}">${statusText}</span></div>
+                    <div><strong>Tipo:</strong> ${getProblemTypeText(r.problemType)}</div>
+                    <div>${r.description}</div>
+                    <div class="report-date">${r.date}</div>
+                `;
+                
+                container.appendChild(div);
+            });
+        }
+        
+        function getProblemTypeText(type) {
+            const types = {
+                'buraco': 'Buraco na via',
+                'iluminacao': 'Falta de iluminação',
+                'lixo': 'Acúmulo de lixo',
+                'agua': 'Vazamento de água',
+                'outro': 'Outro'
+            };
+            
+            return types[type] || type;
+        }
+        
+        // Navegação
+        function showPage(pageId) {
+            // Esconder todas as páginas
+            document.querySelectorAll('.container').forEach(page => {
+                page.classList.add('hidden');
+            });
+            
+            // Mostrar a página solicitada
+            document.getElementById(pageId).classList.remove('hidden');
+            
+            // Mostrar/ocultar navegação
+            if (pageId === 'login-page' || pageId === 'register-page') {
+                document.getElementById('navigation').classList.add('hidden');
+            } else {
+                document.getElementById('navigation').classList.remove('hidden');
+                updateNavigation(pageId);
+                
+                // Carregar dados específicos da página
+                if (pageId === 'myreports-page') {
+                    displayReports();
+                } else if (pageId === 'profile-page') {
+                    loadProfile();
+                }
+            }
+        }
+        
+        function updateNavigation(activePage) {
+            // Remover classe active de todos os links
+            document.querySelectorAll('nav a').forEach(link => {
+                link.classList.remove('active');
+            });
+            
+            // Adicionar classe active ao link correspondente
+            switch(activePage) {
+                case 'report-page':
+                    document.getElementById('nav-report').classList.add('active');
+                    break;
+                case 'myreports-page':
+                    document.getElementById('nav-myreports').classList.add('active');
+                    break;
+                case 'profile-page':
+                    document.getElementById('nav-profile').classList.add('active');
+                    break;
+            }
+        }
+    </script>
+</body>
+</html>
+```
